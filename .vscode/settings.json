@@ -2,12 +2,14 @@
     "python.autoComplete.extraPaths": [
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages",
+        "/home/dev/ros2_ws/build",
         "src",
         "install/lib/python3.10/site-packages"
     ],
     "python.analysis.extraPaths": [
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages",
+        "/home/dev/ros2_ws/build",
         "src",
         "install/lib/python3.10/site-packages"
     ]
