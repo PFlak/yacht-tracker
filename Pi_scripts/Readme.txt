@@ -1,0 +1,1 @@
+urządzenia należy podpinać jak na załączonej grafice
