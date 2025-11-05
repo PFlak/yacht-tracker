@@ -87,6 +87,7 @@ RUN chown -R ${USERNAME}:root /home/${USERNAME}/ros2_ws
 
 RUN sudo pip3 install osqp
 RUN sudo pip3 install casadi
+RUN sudo pip3 install "fastapi[standard]"
 
 USER ${USERNAME}
 
