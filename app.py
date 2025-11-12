@@ -1,21 +1,14 @@
-import http.server
-import socketserver
-import webbrowser
-import threading
-import os
+from flask import Flask
+from routes import init_routes
 
-frontend_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend")
-os.chdir(frontend_dir)
+app = Flask(
+    __name__, 
+    template_folder="frontend/templates", 
+    static_folder="frontend/static"
+)
 
-def start_server():
-    Handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", 8000), Handler) as httpd:
-        print(f"Serwer działa na http://localhost:8000")
-        httpd.serve_forever()
+# załaduj routes
+init_routes(app)
 
-# Uruchomienie serwera w osobnym wątku
-threading.Thread(target=start_server, daemon=True).start()
-
-webbrowser.open("http://localhost:8000")
-
-input("Naciśnij Enter, aby zakończyć serwer...\n")
+if __name__ == "__main__":
+    app.run(debug=True, port=8000)
