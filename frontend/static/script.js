@@ -86,10 +86,3 @@ document.getElementById("search-btn").addEventListener("click", () => {
 });
 
 
-// Autocomplete / dynamiczny search
-const searchInput = document.getElementById("search-input");
-searchInput.addEventListener("input", () => {
-  const query = searchInput.value.trim().toLowerCase();
-  const filtered = boats.filter(b => b.name.toLowerCase().includes(query));
-  renderBoatList(filtered);
-});
