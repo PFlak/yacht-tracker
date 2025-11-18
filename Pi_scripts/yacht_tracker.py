@@ -1,24 +1,27 @@
 import serial
 import time
+from at_commands import *
+from serial_handler import Serial_device_handler as SDH
 
 DEVICE = '/dev/ttyS0'
 BAUDRATE = 115200
 SERIAL_TIMEOUT = 2
+LOOP_TIME = 30
 
-def init_serial():
-    ser = serial.Serial(DEVICE , baudrate = BAUDRATE, timeout = SERIAL_TIMEOUT) # this configuratyion is correct
-    ser.flushInput()
-    pass
+# Todo: get device id
 
-def close_serial():
-    pass
+def the_loop():
+    
+    time.sleep(30)
 
 def main():
-    #Todo
-    init_serial()
-    #To ma zastać na samym końcu
-    close_serial()
-    pass
+    sdh = SDH(DEVICE, BAUDRATE, SERIAL_TIMEOUT)
+
+    #Todo: obsłużyć żyroskop 
+    
+    #Todo: obsłużyć wyświetlacz
+
+    #Todo: obsłużyć sysyłanie
 
 if __name__ == "__main__":
     main()
