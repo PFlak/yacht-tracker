@@ -1,6 +1,5 @@
 import serial
 import time
-from at_commands import *
 from serial_handler import Serial_device_handler as SDH
 
 DEVICE = '/dev/ttyS0'
@@ -17,6 +16,7 @@ def the_loop():
 def main():
     sdh = SDH(DEVICE, BAUDRATE, SERIAL_TIMEOUT)
 
+    print(sdh.get_gps_data())
     #Todo: obsłużyć żyroskop 
     
     #Todo: obsłużyć wyświetlacz

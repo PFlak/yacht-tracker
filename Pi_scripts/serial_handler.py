@@ -22,14 +22,16 @@ class Serial_device_handler():
         self.ser.close()
 
     def serial_connection_test(self):
-        if self.send_at(self.ser, 'at', False, False).upper() != "OK":
-            print("!!! Serial connection not working !!!")
+        print (self.send_at('at', False, False).upper())
+        # Todo, zrobić tak, żeby dobrze działało
+        # if self.send_at('at', False, False).upper()[-2:-1] != 'OK':
+        #     print("!!! Serial connection not working !!!")
 
     def send_at(self, command: str, display_mode = True, debbug_mode = False) -> str:
+        ''' Sent at command, wait 1 second , read and return response'''
         self.ser.write((command + '\r\n').encode())
         time.sleep(1)
-        response = serial.read_all().decode(errors='ignore')
-
+        response = self.ser.read_all().decode(errors='ignore')
         if display_mode:
             print(f"Command: {command}\nResponse: {response}\n")
         if debbug_mode: # a to nie wiem po co dałem
@@ -48,7 +50,6 @@ class Serial_device_handler():
 
         # cuting and extracting necesery data
         splited = raw_gps_data.split(',')
-        print(splited)
         self.gps_data = {'time' : splited[2], 'latitude' : splited[3], 'longitude' : splited[4], 'C/N0': splited[19] , 'HPA' : splited[20] }
 
         # ToDo: Check if data are credible (time > 20251104173835.000)
