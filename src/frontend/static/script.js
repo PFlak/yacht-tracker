@@ -22,7 +22,7 @@ const boatIcon = L.icon({
   iconAnchor: [16, 16]
 });
 
-const markers = {}; // store markers by name
+const markers = {}; 
 
 // Sidebar list
 const list = document.getElementById("boat-list");
@@ -71,7 +71,7 @@ boats.forEach(b => {
 
 map.addLayer(markerCluster);
 
-// Search
+// Wyszukiwanie
 document.getElementById("search-btn").addEventListener("click", () => {
   const q = document.getElementById("search-input").value.trim().toLowerCase();
   const found = boats.find(b => b.name.toLowerCase() === q);

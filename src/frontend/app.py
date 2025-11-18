@@ -3,8 +3,8 @@ from routes import init_routes
 
 app = Flask(
     __name__, 
-    template_folder="frontend/templates", 
-    static_folder="frontend/static"
+    template_folder="templates", 
+    static_folder="static"
 )
 
 # załaduj routes

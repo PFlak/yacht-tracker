@@ -1,4 +1,4 @@
-// Lista łodzi – bez statusu
+// Lista łodzi 
 const boats = [
   { name: "Alicja", price: 120, img: "https://source.unsplash.com/400x300/?sailboat" },
   { name: "Igła", price: 90, img: "https://source.unsplash.com/400x301/?yacht" },
@@ -7,7 +7,6 @@ const boats = [
   { name: "Posejdon", price: 140, img: "https://source.unsplash.com/400x304/?marina" },
 ];
 
-// Elementy DOM — NAZWA ZMIENIONA NA boat-list
 const boatList = document.getElementById("boat-list");
 const addModal = document.getElementById("addBoatModal");
 const deleteModal = document.getElementById("deleteBoatModal");

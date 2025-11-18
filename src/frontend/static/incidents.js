@@ -64,8 +64,29 @@ document.querySelectorAll('.acc-item').forEach(item => {
     });
 });
 
-
 const events = getEventsFromAccordion();
+
+document.querySelectorAll('.acc-title').forEach(title => {
+    title.addEventListener('click', () => {
+        const content = title.nextElementSibling;
+
+        if(content.style.maxHeight && content.style.maxHeight !== "0px"){
+            content.style.maxHeight = "0px";
+            setTimeout(() => content.style.display = "none", 300);
+        } else {
+            document.querySelectorAll('.acc-content').forEach(c => {
+                if(c !== content){
+                    c.style.maxHeight = "0px";
+                    setTimeout(() => c.style.display = "none", 300);
+                }
+            });
+
+            content.style.display = "block";
+            const height = content.scrollHeight + "px";
+            setTimeout(() => content.style.maxHeight = height, 10);
+        }
+    });
+});
 
 // Render kalendarza
 function renderCalendar() {
@@ -160,28 +181,6 @@ function closePopup(){
     document.getElementById('dayPopup').style.display = 'none';
 }
 
-// Accordion po lewej
-document.querySelectorAll('.acc-title').forEach(title => {
-    title.addEventListener('click', () => {
-        const content = title.nextElementSibling;
-
-        if(content.style.maxHeight && content.style.maxHeight !== "0px"){
-            content.style.maxHeight = "0px";
-            setTimeout(() => content.style.display = "none", 300);
-        } else {
-            document.querySelectorAll('.acc-content').forEach(c => {
-                if(c !== content){
-                    c.style.maxHeight = "0px";
-                    setTimeout(() => c.style.display = "none", 300);
-                }
-            });
-
-            content.style.display = "block";
-            const height = content.scrollHeight + "px";
-            setTimeout(() => content.style.maxHeight = height, 10);
-        }
-    });
-});
 
 // Rozwijana lista lat
 function showYearDropdown(monthYearDiv) {
