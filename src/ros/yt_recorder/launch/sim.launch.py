@@ -66,5 +66,5 @@ def generate_launch_description():
         init_origin_node,
         tf_node,
         sail_1,
-        sail_2
+        # sail_2
     ])
