@@ -15,6 +15,8 @@ from yt_recorder.models.boat_route import BoatRoute
 from yt_recorder.models.position_update import PositionUpdate
 from yt_recorder.models.recorder_synchronization import RecorderSynchronization
 
+from SIM7000_handler import SIM7000_handler as SIM
+
 
 class Recorder(Node):
 
@@ -79,6 +81,8 @@ class Recorder(Node):
         self.update_time = 0.0
         self.update_timer = None
 
+        self.sim = SIM()
+
     def cb_sim_timer(self):
         now = self.get_clock().now()
         try:
@@ -133,6 +137,9 @@ class Recorder(Node):
             self.get_logger().error(f"{e}")
 
     def cb_position_snapshot_timer(self):
+
+        self.latitude, self.longitude = self.sim.get_lat_and_logn(self)
+
         now = datetime.now().timestamp()
 
         boat_position = BoatPosition(id=0,
