@@ -1,0 +1,148 @@
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: #d4f2ff;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 42px;
+  color: #0b3b4d;
+  font-weight: 900;
+}
+
+.top-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+}
+
+
+.topbar {
+  background: #91c8d9;
+  padding: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;       
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav .btn {
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 40px;
+  background: white;
+  color: #0b3b4d;
+  font-weight: 600;
+  margin-left: 10px;
+  border: 2px solid #0b3b4d;
+  white-space: nowrap; 
+}
+
+
+nav .btn:hover {
+  background: #0b3b4d;
+  color: white;
+}
+
+main {
+  display: flex;
+}
+
+#map {
+  width: 70%;
+  height: calc(100vh - 110px);
+}
+
+#sidebar {
+  width: 30%;
+  background: white;
+  padding: 20px;
+  height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+
+#sidebar h2 {
+  margin-top: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+#search-input {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #2f73b6;
+}
+
+button {
+  padding: 8px 14px;
+  background: #2f73b6;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: .8;
+}
+
+#boat-list {
+  list-style: none;
+  padding: 0;
+}
+
+.boat-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid #aaa;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  margin-bottom: 5px;
+  border-radius: 5px;
+}
+
+.boat-item span {
+  font-weight: bold;
+  margin-left: 10px;
+  transition: transform 0.3s;
+}
+
+.boat-details {
+  font-size: 14px;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 15px;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+  background-color: #f9f9f9;
+  border-left: 3px solid #2f73b6;
+  margin-bottom: 5px;
+  border-radius: 0 5px 5px 0;
+}
+
+.boat-details.open {
+  max-height: 200px;
+  padding: 10px 15px;
+}
+
+.boat-thumb:hover {
+  transform: scale(1.2);
+}
+
+.leaflet-marker-icon:hover {
+  transform: scale(1.25);
+}
