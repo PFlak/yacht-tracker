@@ -8,7 +8,7 @@ class Alert(BaseModel):
     id: int
     boat_id: int
     timestamp: float
-    alert_type: Literal['dangerr', 'weather', 'other']
+    alert_type: Literal['danger', 'weather', 'other']
     severity: int = Field(0, ge=0, le=3)
     description: str
     parameters: list[AlertParameters] = Field([])
@@ -18,4 +18,4 @@ class Alert(BaseModel):
 
 
 class Alerts(BaseModel):
-    array: list[Alert]
+    data: list[Alert]

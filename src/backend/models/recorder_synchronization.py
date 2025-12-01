@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional, Literal
 
 from .boat_route import BoatRoute
+from .alerts import Alerts
 
 
 class RecorderSynchronization(BaseModel):
@@ -13,3 +14,4 @@ class RecorderSynchronization(BaseModel):
     position_stamp_period: int = Field(5, description="Time in seconds in which gps position stamp will be captured")
     boat_route: Optional[BoatRoute] = Field(None, description="Route gathered by recorder during period when it was online")
     direct_message: Optional[str] = Field(None, description="Message that should be shown on recorder display")
+    alerts: Optional[Alerts] = Field(None, description='Alerts that happened since last sync')
