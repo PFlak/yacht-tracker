@@ -28,7 +28,9 @@ def recorder_synchronization(recorder_id: int, body: RecorderSynchronization):
     data = RecorderSynchronization(boat_id=recorder_id,
                                    status='ok',
                                    timestamp=now.timestamp(),
-                                   direct_message="Test Message")
+                                   direct_message="Test Message",
+                                   alerts=body.alerts,
+                                   boat_route=body.boat_route)
 
     response = JSONResponse(content=data.model_dump(),
                             status_code=status.HTTP_200_OK)
