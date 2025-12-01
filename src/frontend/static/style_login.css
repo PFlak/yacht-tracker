@@ -1,0 +1,156 @@
+:root {
+  --sea-1: #c9f2ff;
+  --sea-2: #d4f2ff;
+  --accent: #0b3b4d;
+  --muted: #87b5c3;
+  --btn: #2f73b6;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, var(--sea-2) 0%, var(--sea-1) 100%);
+  color: var(--accent);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top bar */
+.topbar h1 {
+  margin: 0;
+  font-size: 42px;
+  color: #0b3b4d;
+  font-weight: 900;
+}
+
+.topbar {
+  background: #91c8d9;
+  padding: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav .btn {
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 40px;
+  background: white;
+  color: #0b3b4d;
+  font-weight: 600;
+  margin-left: 10px;
+  border: 2px solid #0b3b4d;
+  white-space: nowrap;
+  transition: 0.2s;
+}
+
+nav .btn:hover {
+  background: #0b3b4d;
+  color: white;
+}
+
+/* Panel logowania */
+.login-container {
+  margin: 60px auto;
+  background: white;
+  padding: 40px 50px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 380px;
+  text-align: center;
+}
+
+/* Nagłówek w panelu */
+.box-head h2 {
+  margin-bottom: 25px;
+  color: #0b3b4d;
+  font-weight: 900;
+}
+
+/* Formularz */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; 
+  text-align: left;
+  margin: 0 auto;
+}
+
+/* Etykiety */
+label {
+  font-weight: bold;
+  color: #0b3b4d;
+  margin-left: 4px; 
+}
+
+/* Pola tekstowe */
+input {
+  padding: 12px 12px;
+  border-radius: 6px;
+  border: 1.8px solid #91c8d9;
+  font-size: 16px;
+  width: 95%;
+  background: #ffffff;
+  transition: 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #0b3b4d;
+  box-shadow: 0 0 6px rgba(11, 59, 77, 0.15);
+}
+
+button[type="submit"] {
+  margin-top: 10px;
+  background: #b7f3c3;
+  border: 2px solid #000;
+  border-radius: 12px;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+
+button[type="submit"]:hover {
+  transform: scale(1.05);
+}
+
+/* Stopka formularza */
+.form-foot {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #0b3b4d;
+  text-align: center;
+}
+
+.form-foot a {
+  color: #0b3b4d;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.form-foot a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive adjustments */
+@media (max-width: 420px) {
+  .login-container {
+    padding: 22px;
+    border-radius: 14px;
+  }
+  .topbar {
+    padding: 14px 16px;
+  }
+  .topbar .brand h1 {
+    font-size: 18px;
+  }
+}
