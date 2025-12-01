@@ -1,16 +1,22 @@
 // Lista łodzi 
-const boats = [
-  { name: "Alicja", price: 120, img: "https://source.unsplash.com/400x300/?sailboat" },
-  { name: "Igła", price: 90, img: "https://source.unsplash.com/400x301/?yacht" },
-  { name: "Rybak", price: 70, img: "https://source.unsplash.com/400x302/?boat" },
-  { name: "Irmina", price: 80, img: "https://source.unsplash.com/400x303/?sea" },
-  { name: "Posejdon", price: 140, img: "https://source.unsplash.com/400x304/?marina" },
-];
+let boats = [];
 
 const boatList = document.getElementById("boat-list");
 const addModal = document.getElementById("addBoatModal");
 const deleteModal = document.getElementById("deleteBoatModal");
 const deleteSelect = document.getElementById("deleteBoatSelect");
+
+// Funkcja pobierająca łodzie z backendu
+async function loadBoats() {
+  try {
+    const res = await fetch("/ui/fleet");
+    const data = await res.json();
+    boats = data.array || [];
+    renderBoats();
+  } catch (err) {
+    console.error("Błąd ładowania łodzi:", err);
+  }
+}
 
 // Render listy łódek
 function renderBoats() {
@@ -24,8 +30,10 @@ function renderBoats() {
     const info = document.createElement("div");
     info.className = "boat-details";
     info.innerHTML = `
-      Price: ${b.price} PLN/h<br>
-      <img src="${b.img}" width="200" style="margin-top:8px;border-radius:8px">
+ Model: ${b.model || "brak"}<br>
+      Type: ${b.boat_type || "brak"}<br>
+      Contact: ${b.contact_number || "brak"}<br>
+      <img src="https://source.unsplash.com/400x30${Math.floor(Math.random() * 9)}/?sail" width="200" style="margin-top:8px;border-radius:8px">
     `;
 
     li.onclick = () => {
@@ -35,10 +43,9 @@ function renderBoats() {
 
     boatList.appendChild(li);
     boatList.appendChild(info);
-    deleteSelect.innerHTML += `<option value="${b.name}">${b.name}</option>`;
+    deleteSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`;
   });
 }
-renderBoats();
 
 // Przyciski do modali
 document.getElementById("addBoatBtn").onclick = () => (addModal.style.display = "flex");
@@ -52,22 +59,51 @@ document.querySelectorAll(".close-modal").forEach(btn =>
 );
 
 // Dodawanie łódki
-document.getElementById("saveBoat").onclick = () => {
-  boats.push({
-    name: document.getElementById("boatName").value,
-    price: document.getElementById("boatPrice").value,
-    img: `https://source.unsplash.com/400x30${Math.floor(Math.random() * 9)}/?sail`
-  });
+document.getElementById("saveBoat").onclick = async () => {
+  const name = document.getElementById("boatName").value;
+  const model = document.getElementById("boatModel").value;
+  const type = document.getElementById("boatType").value;
+  const contact = document.getElementById("boatContact").value;
 
+  try {
+    const res = await fetch("/recorder/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: name,
+        created_at: Date.now(),
+        model: model,
+        boat_type: type,
+        contact_number: contact
+      })
+    });
+    const newBoat = await res.json();
+    boats.push(newBoat);
+    addModal.style.display = "none";
+    renderBoats();
+  } catch (err) {
+    console.error("Błąd dodawania łódki:", err);
+  }
   addModal.style.display = "none";
   renderBoats();
 };
 
+
 // Usuwanie łódki
-document.getElementById("confirmDelete").onclick = () => {
-  const name = deleteSelect.value;
-  const idx = boats.findIndex(b => b.name === name);
-  if (idx !== -1) boats.splice(idx, 1);
+document.getElementById("confirmDelete").onclick = async () => {
+  const id = deleteSelect.value;
+  try {
+      await fetch(`/ui/fleet/${id}`, {
+      method: "DELETE"
+    });
+    boats = boats.filter(b => b.id != id);
+    deleteModal.style.display = "none";
+    renderBoats();
+  } catch (err) {
+    console.error("Błąd usuwania łódki:", err);
+  }
   deleteModal.style.display = "none";
   renderBoats();
 };
+
+loadBoats();
