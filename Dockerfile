@@ -5,9 +5,9 @@
 # aby zredukować rozmiar, jeśli nie jest potrzebny pełny pulpit. 
 # Jeśli potrzebujesz wszystkich pakietów 'desktop-full' (jak rviz), 
 # zmień tag, ale pamiętaj, że będzie znacznie większy.
-FROM osrf/ros:humble-ros-core
+FROM ros:humble-ros-core
 
-ARG ROS_PACKAGE=ros_base
+ARG ROS_PACKAGE=ros_core
 ARG ROS_VERSION=humble
 
 ENV ROS_DISTRO=${ROS_VERSION} \
@@ -25,6 +25,9 @@ ARG USER_GID=$USER_UID
 # 2. Tworzenie użytkownika i sudo
 RUN apt-get update \
     && apt-get install -y sudo \
+    ca-certificates \
+    curl \
+    gnupg \
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
     && mkdir /home/$USERNAME/.config && chown $USER_UID:$USER_GID /home/$USERNAME/.config \
@@ -59,10 +62,6 @@ RUN apt-get update \
 RUN apt-get update \
     && apt-get install -y \
     ros-$ROS_DISTRO-tf-transformations \
-    ros-$ROS_DISTRO-mapviz \
-    ros-$ROS_DISTRO-mapviz-plugins \
-    ros-$ROS_DISTRO-tile-map \
-    ros-$ROS_DISTRO-multires-image \
     ros-$ROS_DISTRO-navigation2 \
     ros-$ROS_DISTRO-nav2-bringup \
     && rm -rf /var/lib/apt/lists/*
@@ -71,7 +70,7 @@ USER root
 
 # 5. Klonowanie aliasów i kopiowanie środowiska
 RUN git clone https://github.com/kimushun1101/ros2-aliases.git /home/$USERNAME/ros2-aliases 
-COPY ./ros2aliases.env /home/$USERNAME/ros2-aliases/.env
+COPY .devcontainer/ros2aliases.env /home/$USERNAME/ros2-aliases/.env
 
 # --- SEKCJA NVIDIA USUNIĘTA/ZMIENIONA ---
 # Usunięto instalację pakietów libgl* i ENV NVIDIA_*, 
@@ -80,6 +79,34 @@ COPY ./ros2aliases.env /home/$USERNAME/ros2-aliases/.env
 # 6. Konfiguracja przestrzeni roboczej
 RUN mkdir -p /home/$USERNAME/ros2_ws
 RUN chown -R ${USERNAME}:${USERNAME} /home/${USERNAME}/ros2_ws # Zmieniono grupę na $USERNAME dla spójności
+
+# 6.5. Instalacja Mapviz i pluginów ze źródeł
+# Używamy użytkownika 'dev' do klonowania i budowania
+# USER $USERNAME
+# WORKDIR /home/$USERNAME/ros2_ws/src
+
+# RUN git config --global credential.helper store
+# RUN git config --global core.askPass true
+# RUN git config --global http.sslVerify false
+
+# # Klonowanie Mapviz i jego zależności
+# RUN git clone -c core.askPass=true https://github.com/swri-robotics/mapviz.git \
+#     && git clone -c core.askPass=true https://github.com/swri-robotics/mapviz_plugins.git \
+#     && git clone -c core.askPass=true https://github.com/swri-robotics/tile_map.git \
+#     && git clone -c core.askPass=true https://github.com/swri-robotics/multires_image.git
+
+# Powrót do katalogu głównego workspace i budowanie
+# WORKDIR /home/$USERNAME/ros2_ws
+# Używamy narzędzia 'colcon' do budowania sklonowanych pakietów
+# Argumenty:
+# --merge-install - instaluje w jednym folderze 'install' (opcjonalne)
+# --packages-skip-by-dep - pomija pakiety, dla których nie ma zależności (pomaga przy brakujących zależnościach)
+# RUN source /opt/ros/$ROS_DISTRO/setup.bash \
+    # && colcon build --symlink-install --packages-select mapviz mapviz_plugins tile_map multires_image
+    
+# Powrót na roota, aby kontynuować instalację pip i uprawnienia
+# USER root
+# WORKDIR /home/$USERNAME/ros2_ws/
 
 # 7. Instalacja zależności Pythona
 # Używamy pip3 z sudo, aby zainstalować globalnie
@@ -99,7 +126,7 @@ USER $USERNAME
 
 WORKDIR /home/$USERNAME/ros2_ws/
 
-COPY ./entrypoint.sh /entrypoint.sh
+COPY .devcontainer/entrypoint.sh /entrypoint.sh
 
 # Dostosowanie uprawnień dla entrypoint
 USER root
