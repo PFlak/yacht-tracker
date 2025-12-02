@@ -16,6 +16,7 @@ recorder_router = APIRouter()
 @recorder_router.post('/', response_model=Boat)
 def create_recorder(body: NewBoat):
     b = Boat(id=random.randint(1, 100),
+             name=f'boat-{random.randint(1, 100)}',
              created_at=body.created_at,
              is_online=False,
              is_registered=False,
