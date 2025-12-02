@@ -1,20 +1,19 @@
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi import status, Request
 from fastapi.routing import APIRouter
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from .ui_recorder import recorder_router
 from ..models.boats import Boats, Boat
 from ..utils.time import generate_random_timestamp
 import random
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 import os
 
 ui_router = APIRouter()
 
 ui_router.include_router(recorder_router, prefix='/recorder')
 
-# frontend
-
+#frontend
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "frontend", "templates")
 STATIC_DIR = os.path.join(BASE_DIR, "frontend", "static")
