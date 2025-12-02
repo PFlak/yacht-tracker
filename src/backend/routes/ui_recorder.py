@@ -9,6 +9,12 @@ from ..models.alert_parameters import AlertParameters
 from ..utils.time import generate_random_timestamp, now_as_float
 from ..utils.localization import generate_random_boat_position, generate_random_position
 import random
+from datetime import datetime
+from ..db import get_db_cursor
+from ..models.boat_position import BoatPosition
+from ..models.alerts import Alert, Alerts
+from ..models.alert_parameters import AlertParameters
+from ..utils.time import now_as_float
 
 recorder_router = APIRouter()
 
@@ -41,45 +47,46 @@ def update_recorder(body: Boat):
     return response
 
 
-@recorder_router.get('/alerts', response_model=Alerts)
-def get_recorders_incidents(last_h: int = 24):
+@recorder_router.get("/{recorder_id}/incidents", response_model=Alerts)
+def get_recorders_incidents(
+    recorder_id: int,
+    last_h: int = 24,
+):
+    with get_db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, timestamp, event
+            FROM dbo.YachtEvents
+            WHERE yacht_id = ?
+              AND timestamp >= DATEADD(hour, -?, GETDATE())
+            ORDER BY timestamp DESC
+            """,
+            (recorder_id, last_h),
+        )
+        rows = cur.fetchall()
 
-    lt, lg = generate_random_position()
+    alerts_list: list[Alert] = []
 
-    a1 = Alert(id=1,
-               boat_id=1,
-               timestamp=generate_random_timestamp().timestamp(),
-               alert_type=random.choice(['danger', 'weather', 'other']),
-               severity=random.randint(0, 3),
-               description="Lorem Ipsum",
-               parameters=[AlertParameters(id=1,
-                                           alert_id=1,
-                                           timestamp=now_as_float(),
-                                           boat_position=generate_random_boat_position())],
-               latitude=lt,
-               longitude=lg,
-               resolved=True)
+    for row in rows:
+        event_id, ts, event_text = row
+        ts_float = ts.timestamp() if isinstance(ts, datetime) else float(ts)
 
-    a2 = Alert(id=2,
-               boat_id=2,
-               timestamp=generate_random_timestamp().timestamp(),
-               alert_type=random.choice(['danger', 'weather', 'other']),
-               severity=random.randint(0, 3),
-               description="Lorem Ipsum",
-               parameters=[AlertParameters(id=1,
-                                           alert_id=1,
-                                           timestamp=now_as_float(),
-                                           boat_position=generate_random_boat_position())],
-               latitude=lt,
-               longitude=lg,
-               resolved=True)
+        alert = Alert(
+            id=int(event_id),
+            boat_id=recorder_id,
+            timestamp=ts_float,
+            alert_type="danger",
+            severity=1,
+            description=event_text,
+            parameters=[],
+            latitude=None,
+            longitude=None,
+            resolved=False,
+        )
+        alerts_list.append(alert)
 
-    alerts = Alerts(data=[a1, a2])
-
-    response = JSONResponse(alerts.model_dump(),
-                            status_code=status.HTTP_200_OK)
-
-    return response
+    return JSONResponse(Alerts(data=alerts_list).model_dump(),
+                        status_code=status.HTTP_200_OK)
 
 
 @recorder_router.get('/{recorder_id}/alerts', response_model=Alerts)
@@ -121,15 +128,56 @@ def get_recorder_incidents(recorder_id: int, last_h: int = 24, limit: int = 10):
     return response
 
 
-@recorder_router.get('{recorder_id}/route', response_model=BoatRoute)
-def get_recorder_route(recorder_id: int,
-                       history: bool = Query(description='wether to send position from the past', default=True),
-                       depth: int = Query(default=60, description='Amount of route information in minutes')):
+@recorder_router.get("/{recorder_id}/route", response_model=BoatRoute)
+def get_recorder_route(
+    recorder_id: int,
+    history: bool = Query(
+        description="Czy zwrócić historię z przeszłości",
+        default=True,
+    ),
+    depth: int = Query(
+        default=60,
+        description="Głębokość historii w minutach (ile wstecz)",
+    ),
+):
+    with get_db_cursor() as cur:
+        if history:
+            cur.execute(
+                """
+                SELECT timestamp, latitude, longitude
+                FROM dbo.YachtPosition
+                WHERE yacht_id = ?
+                  AND timestamp >= DATEADD(minute, -?, GETDATE())
+                ORDER BY timestamp
+                """,
+                (recorder_id, depth),
+            )
+        else:
+            cur.execute(
+                """
+                SELECT TOP 1 timestamp, latitude, longitude
+                FROM dbo.YachtPosition
+                WHERE yacht_id = ?
+                ORDER BY timestamp DESC
+                """,
+                (recorder_id,),
+            )
+        rows = cur.fetchall()
 
-    br = BoatRoute(boat_id=recorder_id,
-                   positions=[generate_random_boat_position() for i in range(history)])
+    positions: list[BoatPosition] = []
 
-    response = JSONResponse(br.model_dump(),
-                            status_code=status.HTTP_200_OK)
+    for idx, (ts, lat, lon) in enumerate(rows, start=1):
+        ts_float = ts.timestamp() if isinstance(ts, datetime) else float(ts)
+        positions.append(
+            BoatPosition(
+                id=idx,
+                recorder_id=recorder_id,
+                timestamp=ts_float,
+                latitude=float(lat),
+                longitude=float(lon),
+            )
+        )
 
-    return response
+    br = BoatRoute(boat_id=recorder_id, positions=positions)
+
+    return JSONResponse(br.model_dump(), status_code=status.HTTP_200_OK)
