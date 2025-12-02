@@ -1,0 +1,6 @@
+osqp
+casadi
+"fastapi[standard]"
+requests
+luma.core
+smbus
