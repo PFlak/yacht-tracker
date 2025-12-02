@@ -14,7 +14,7 @@ ui_router.include_router(recorder_router, prefix='/recorder')
 @ui_router.get('/recorders', response_model=Boats)
 def get_all_recorders():
     b1 = Boat(id=random.randint(1, 100),
-              random=f'boat-{random.randint(1,100)}',
+              name=f'boat-{random.randint(1,100)}',
               created_at=generate_random_timestamp().timestamp(),
               is_online=False,
               is_registered=True,
@@ -24,7 +24,7 @@ def get_all_recorders():
               contact_number='666666666')
 
     b2 = Boat(id=random.randint(1, 100),
-              random=f'boat-{random.randint(1,100)}',
+              name=f'boat-{random.randint(1,100)}',
               created_at=generate_random_timestamp().timestamp(),
               is_online=False,
               is_registered=True,
@@ -34,7 +34,7 @@ def get_all_recorders():
               contact_number='666666666')
 
     b3 = Boat(id=random.randint(1, 100),
-              random=f'boat-{random.randint(1,100)}',
+              name=f'boat-{random.randint(1,100)}',
               created_at=generate_random_timestamp().timestamp(),
               is_online=False,
               is_registered=True,
