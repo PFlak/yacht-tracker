@@ -5,7 +5,7 @@
 # aby zredukować rozmiar, jeśli nie jest potrzebny pełny pulpit. 
 # Jeśli potrzebujesz wszystkich pakietów 'desktop-full' (jak rviz), 
 # zmień tag, ale pamiętaj, że będzie znacznie większy.
-FROM osrf/ros:humble-ros-base-jammy-arm64v8
+FROM osrf/ros:humble-ros-core
 
 ARG ROS_PACKAGE=ros_base
 ARG ROS_VERSION=humble
