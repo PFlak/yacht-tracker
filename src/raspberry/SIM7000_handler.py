@@ -14,7 +14,7 @@ class SIM7000_handler():
         ## initialize connection
         self.ser = serial.Serial(device, baudrate= baudrate, timeout= timeout)
         self.ser.flushInput()
-        self.serial_connection_test()
+        # self.serial_connection_test()
 
         self.set_gps_on()
 
@@ -43,7 +43,7 @@ class SIM7000_handler():
         self.send_at('AT+CGNSPWR=1')  # Power on GPS
 
     def get_lat_and_logn(self):
-        self.get_gps_data(self)
+        self.get_gps_data()
         return self.gps_data.get("latitude"), self.gps_data.get("longitude"), 
 
     def get_gps_data(self) -> dict:

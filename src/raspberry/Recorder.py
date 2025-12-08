@@ -7,6 +7,8 @@ from models.recorder_synchronization import RecorderSynchronization
 
 from AdjustableTimer import AdjustableTimer
 
+from SIM7000_handler import SIM7000_handler
+
 class Recorder:
 
     def __init__(self):
@@ -21,6 +23,8 @@ class Recorder:
 
         self.longitude = 0.0
         self.latitude = 0.0
+
+        self.sim_handler = SIM7000_handler()
 
         self.boat_route: BoatRoute = BoatRoute(boat_id=self.id)
 
@@ -94,6 +98,14 @@ class Recorder:
     def cb_position_snapshot_timer(self):
         print(f"Position Snapshot Time: {datetime.now().strftime('%d/%m/%Y, %H:%M:%S')}")
         now = datetime.now().timestamp()
+
+        latitude, longitude = self.sim_handler.get_lat_and_logn()
+        if latitude and longitude:
+            self.latitude = int(latitude)
+            self.longitude = int(longitude)
+        else:
+            pass
+            #wymyślić reakcje na prak odczytu GPSA? 
 
         boat_position = BoatPosition(id=0,
                                      recorder_id=self.id,
