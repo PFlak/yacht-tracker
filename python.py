@@ -132,7 +132,7 @@ def init_ak8963():
     bus.write_byte_data(AK8963_ADDR, AK_CNTL1, 0x0F); time.sleep(0.01)
     asa = bus.read_i2c_block_data(AK8963_ADDR, AK_ASAX, 3)
     adj = [((a - 128) / 256.0) + 1.0 for a in asa]
-    bus.write_byte_data(AK8963_ADDR, AK_CNTL1, 0x00); time.sleep(0.01))
+    bus.write_byte_data(AK8963_ADDR, AK_CNTL1, 0x00); time.sleep(0.01)
     bus.write_byte_data(AK8963_ADDR, AK_CNTL2, 0x01); time.sleep(0.01)
     bus.write_byte_data(AK8963_ADDR, AK_CNTL1, 0x16); time.sleep(0.01)
     return adj
