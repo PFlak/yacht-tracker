@@ -1,10 +1,3 @@
-// Dummy boats
-const boats = [
-  { name: "Alicja", lat: 53.9, lon: 21.7, status: "At sea", wind: "12kn"},
-  { name: "Igła", lat: 53.8, lon: 21.55, status: "Anchored", wind: "9kn"},
-  { name: "Rybak", lat: 53.7, lon: 21.65, status: "Docked", wind: "5kn"},
-];
-
 // Map init
 const map = L.map("map").setView([53.8, 21.7], 10);
 
@@ -15,7 +8,7 @@ L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png').addTo(map);
 // Marker cluster
 const markerCluster = L.markerClusterGroup();
 
-// Custom icon
+// Icon
 const boatIcon = L.icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/77/77521.png",
   iconSize: [32, 32],
@@ -26,50 +19,68 @@ const markers = {};
 
 // Sidebar list
 const list = document.getElementById("boat-list");
-boats.forEach(boat => {
-  const li = document.createElement("li");
-  li.className = "boat-item";
-  li.innerHTML = `${boat.name} <span>+</span>`;
+const myFleetBtn = document.querySelector("nav a[href='/my_fleet']");
 
-  const info = document.createElement("div");
-  info.className = "boat-details";
-  info.innerHTML = `
-    Status: ${boat.status}<br>
-    Wind: ${boat.wind}<br>
-    Position: ${boat.lat.toFixed(2)}, ${boat.lon.toFixed(2)}
-  `;
+// Ukryj przycisk My Fleet dopóki nie wiemy, czy użytkownik zalogowany
+myFleetBtn.style.display = "none";
 
-  li.addEventListener("click", () => {
-    const open = info.classList.toggle("open");
-    li.querySelector("span").textContent = open ? "-" : "+";
+// Funkcja do ładowania floty zalogowanego użytkownika
+async function loadFleet() {
+  try {
+    const res = await fetch("/ui/recorders");
+    if(res.status === 401){
+      // niezalogowany
+      list.innerHTML = "<li>Log in to show your fleet</li>";
+      return;
+    }
 
-    //  center map & open popup
-    map.flyTo([boat.lat, boat.lon], 13);
-    markers[boat.name].openPopup();
-  });
+    const data = await res.json();
+    const boats = data.array || [];
 
-  list.appendChild(li);
-  list.appendChild(info);
-});
+    if(boats.length > 0) myFleetBtn.style.display = "inline-block"; // pokaż My Fleet
 
-// Markers
-boats.forEach(b => {
-  const marker = L.marker([b.lat, b.lon], { 
-      icon: boatIcon,
-      zIndexOffset: 500   //  prevents icon jumping
-    })
-    .bindPopup(`
-      <b>${b.name}</b><br>
-      Status: ${b.status}<br>
-      Wind: ${b.wind}<br>
-    `);
+    // render sidebar
+    list.innerHTML = "";
+    boats.forEach(boat => {
+      const li = document.createElement("li");
+      li.className = "boat-item";
+      li.innerHTML = `${boat.name} <span>+</span>`;
 
-  markers[b.name] = marker; // reference
+      const info = document.createElement("div");
+      info.className = "boat-details";
+      info.innerHTML = `
+        Status: ${boat.is_online ? "Online" : "Offline"}<br>
+        Type: ${boat.boat_type || "-"}<br>
+        Model: ${boat.model || "-"}<br>
+      `;
 
-  markerCluster.addLayer(marker);
-});
+      li.addEventListener("click", () => {
+        const open = info.classList.toggle("open");
+        li.querySelector("span").textContent = open ? "-" : "+";
 
-map.addLayer(markerCluster);
+        // jeśli mamy pozycję gps w boat.last_seen_at itp., ustaw marker
+        if(boat.latitude && boat.longitude){
+          map.flyTo([boat.latitude, boat.longitude], 13);
+          if(markers[boat.name]) markers[boat.name].openPopup();
+        }
+      });
+      list.appendChild(li);
+      list.appendChild(info);
+      // marker na mapie (jeżeli mamy pozycję)
+      if(boat.latitude && boat.longitude){
+        const marker = L.marker([boat.latitude, boat.longitude], { icon: boatIcon })
+          .bindPopup(`<b>${boat.name}</b><br>Status: ${boat.is_online ? "Online":"Offline"}<br>Type: ${boat.boat_type || "-"}<br>Model: ${boat.model || "-"}`);
+        markers[boat.name] = marker;
+        markerCluster.addLayer(marker);
+      }
+    });
+
+    map.addLayer(markerCluster);
+  } catch(err) {
+    console.error("Błąd ładowania floty:", err);
+    list.innerHTML = "<li>Unable to load fleet</li>";
+  }
+}
 
 // Wyszukiwanie
 document.getElementById("search-btn").addEventListener("click", () => {
@@ -84,5 +95,4 @@ document.getElementById("search-btn").addEventListener("click", () => {
   map.flyTo([found.lat, found.lon], 13);
   markers[found.name].openPopup();
 });
-
-
+loadFleet();

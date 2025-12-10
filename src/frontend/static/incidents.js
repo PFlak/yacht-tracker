@@ -1,92 +1,110 @@
 const calendarContainer = document.getElementById('calendarContainer');
 let currentDate = new Date();
+let boats = [];
+let events = {};
 
-// Pobranie wydarzeń z panelu accordion
-function getEventsFromAccordion() {
-    const events = {};
-    document.querySelectorAll('.acc-item').forEach(item => {
-        const boatName = item.querySelector('.acc-title').textContent;
-        const lis = item.querySelectorAll('ul li');
-        lis.forEach(li => {
-            const text = li.textContent;
-            const match = text.match(/\((\d{2})\.(\d{2})\.(\d{4})\)/);
-            if(match){
-                const day = match[1];
-                const month = match[2];
-                const year = match[3];
-                const dateKey = `${year}-${month}-${day}`;
-                if(!events[dateKey]) events[dateKey] = [];
-                events[dateKey].push(`${boatName}: ${text.replace(match[0],'').trim()}`);
-            }
-        });
+// Pobranie danych z backendu
+async function loadData() {
+  try {
+    // Pobranie łodzi
+    const boatsRes = await fetch('/ui/recorders');
+    const boatsData = await boatsRes.json();
+    boats = boatsData.array || [];
+
+    // Pobranie alertów
+    const alertsRes = await fetch('/recorder/alerts');
+    const alertsData = await alertsRes.json();
+
+    // Przygotowanie events do kalendarza
+    events = {};
+    alertsData.data.forEach(alert => {
+      const date = new Date(alert.timestamp * 1000); // timestamp w sekundach
+      const dateKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+      if(!events[dateKey]) events[dateKey] = [];
+      const boat = boats.find(b => b.id === alert.boat_id);
+      const boatName = boat ? boat.name : `Boat ${alert.boat_id}`;
+      events[dateKey].push(`${boatName}: ${alert.description}`);
     });
-    return events;
+
+    renderAccordion();
+    renderCalendar();
+  } catch (err) {
+    console.error("Błąd pobierania danych:", err);
+  }
 }
 
-// Accordion po lewej 
-document.querySelectorAll('.acc-item').forEach(item => {
-    const title = item.querySelector('.acc-title');
+// Render accordion
+function renderAccordion() {
+  const accContainer = document.getElementById('accordion');
+  accContainer.innerHTML = '';
 
-    let icon = title.querySelector('.acc-icon');
-    if(!icon){
-        icon = document.createElement('span');
-        icon.className = 'acc-icon';
-        icon.textContent = '+';
-        title.append(icon);
+  boats.forEach(boat => {
+    const item = document.createElement('div');
+    item.className = 'acc-item';
+
+    const title = document.createElement('div');
+    title.className = 'acc-title';
+    title.textContent = boat.name;
+    const icon = document.createElement('span');
+    icon.className = 'acc-icon';
+    icon.textContent = '+';
+    title.appendChild(icon);
+    item.appendChild(title);
+
+    const content = document.createElement('div');
+    content.className = 'acc-content';
+
+    // Filtruj alerty dla tej łódki
+    const boatAlerts = [];
+    for(const [date, list] of Object.entries(events)) {
+      list.forEach(ev => {
+        if(ev.startsWith(boat.name + ":")) {
+          boatAlerts.push(`${ev.replace(boat.name+":","").trim()} (${date})`);
+        }
+      });
     }
+    if(boatAlerts.length > 0){
+      content.innerHTML = `<ul>${boatAlerts.map(a => `<li>${a}</li>`).join('')}</ul>`;
+    } else {
+      content.innerHTML = "<p>Brak wydarzeń</p>";
+    }
+    item.appendChild(content);
+    accContainer.appendChild(item);
+  });
 
+  attachAccordionLogic();
+}
+
+function attachAccordionLogic() {
+  document.querySelectorAll('.acc-item').forEach(item => {
+    const title = item.querySelector('.acc-title');
     const content = item.querySelector('.acc-content');
+    const icon = title.querySelector('.acc-icon');
 
     title.addEventListener('click', () => {
-        const isOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
-
-        document.querySelectorAll('.acc-content').forEach(c => {
-            if(c !== content){
-                c.style.maxHeight = "0px";
-                if(c.previousElementSibling){
-                    const ic = c.previousElementSibling.querySelector('.acc-icon');
-                    if(ic) ic.textContent = '+';
-                }
-                setTimeout(() => c.style.display = "none", 300);
-            }
-        });
-
-        if(isOpen){
-            content.style.maxHeight = "0px";
-            icon.textContent = '+';
-            setTimeout(() => content.style.display = "none", 300);
-        } else {
-            content.style.display = "block";
-            const height = content.scrollHeight + "px";
-            setTimeout(() => content.style.maxHeight = height, 10);
-            icon.textContent = '×';
+      const isOpen = content.style.maxHeight && content.style.maxHeight !== "0px";
+      document.querySelectorAll('.acc-content').forEach(c => {
+        if(c !== content){
+          c.style.maxHeight = "0px";
+          const ic = c.previousElementSibling.querySelector('.acc-icon');
+          if(ic) ic.textContent = '+';
+          setTimeout(() => c.style.display = "none", 300);
         }
+      });
+      if(isOpen){
+        content.style.maxHeight = "0px";
+        icon.textContent = '+';
+        setTimeout(() => content.style.display = "none", 300);
+      } else {
+        content.style.display = "block";
+        const height = content.scrollHeight + "px";
+        setTimeout(() => content.style.maxHeight = height, 10);
+        icon.textContent = '×';
+      }
     });
-});
+  });
+}
 
-const events = getEventsFromAccordion();
-
-document.querySelectorAll('.acc-title').forEach(title => {
-    title.addEventListener('click', () => {
-        const content = title.nextElementSibling;
-
-        if(content.style.maxHeight && content.style.maxHeight !== "0px"){
-            content.style.maxHeight = "0px";
-            setTimeout(() => content.style.display = "none", 300);
-        } else {
-            document.querySelectorAll('.acc-content').forEach(c => {
-                if(c !== content){
-                    c.style.maxHeight = "0px";
-                    setTimeout(() => c.style.display = "none", 300);
-                }
-            });
-
-            content.style.display = "block";
-            const height = content.scrollHeight + "px";
-            setTimeout(() => content.style.maxHeight = height, 10);
-        }
-    });
-});
 
 // Render kalendarza
 function renderCalendar() {
@@ -227,3 +245,5 @@ function showYearDropdown(monthYearDiv) {
 }
 
 renderCalendar();
+
+loadData();
