@@ -33,7 +33,7 @@ def init_routes(app):
             flash("Passwords don't match!")
             return render_template("register.html")
 
-        backend_url = "http://localhost:8081/api/user/register"
+        backend_url = "http://localhost:8080/api/user/register"
 
         payload = {
             "username": username,

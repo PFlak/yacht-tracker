@@ -51,6 +51,14 @@ nav .btn:hover {
   color: white;
 }
 
+nav .logout {
+  background: #ffcbcb;
+}
+
+nav .logout:hover {
+  background: #dc3434;
+}
+
 main {
   display: flex;
 }

@@ -21,8 +21,11 @@ const markers = {};
 const list = document.getElementById("boat-list");
 const myFleetBtn = document.querySelector("nav a[href='/my_fleet']");
 
-// Ukryj przycisk My Fleet dopóki nie wiemy, czy użytkownik zalogowany
+// Ukryj przycisk My Fleet i log out dopóki nie wiemy, czy użytkownik zalogowany
 myFleetBtn.style.display = "none";
+const logoutBtn = document.querySelector("nav a.logout");
+logoutBtn.style.display = "none"; // ukryj na start
+
 
 // Funkcja do ładowania floty zalogowanego użytkownika
 async function loadFleet() {
@@ -38,6 +41,8 @@ async function loadFleet() {
     const boats = data.array || [];
 
     if(boats.length > 0) myFleetBtn.style.display = "inline-block"; // pokaż My Fleet
+    logoutBtn.style.display = "inline-block";  // ← pokaż logout
+
 
     // render sidebar
     list.innerHTML = "";
