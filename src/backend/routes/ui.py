@@ -8,6 +8,8 @@ from ..models.boats import Boats, Boat
 from ..utils.time import generate_random_timestamp
 import random
 import os
+from datetime import datetime
+from ..db import get_db_cursor
 
 ui_router = APIRouter()
 
@@ -45,41 +47,52 @@ async def incidents(request: Request):
     return templates.TemplateResponse("incidents.html", {"request": request})
 
 
-@ui_router.get('/recorders', response_model=Boats)
+@ui_router.get("/recorders", response_model=Boats)
 def get_all_recorders():
-    b1 = Boat(id=random.randint(1, 100),
-              name=f'boat-{random.randint(1,100)}',
-              created_at=generate_random_timestamp().timestamp(),
-              is_online=False,
-              is_registered=True,
-              last_seen_at=generate_random_timestamp().timestamp(),
-              model="Antila 27",
-              boat_type='sailboat',
-              contact_number='666666666')
+    boats: list[Boat] = []
 
-    b2 = Boat(id=random.randint(1, 100),
-              name=f'boat-{random.randint(1,100)}',
-              created_at=generate_random_timestamp().timestamp(),
-              is_online=False,
-              is_registered=True,
-              last_seen_at=generate_random_timestamp().timestamp(),
-              model="Maxis 33.3",
-              boat_type='motorboat',
-              contact_number='666666666')
+    with get_db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT yi.yacht_id,
+                   yi.email,
+                   yi.phone,
+                   MAX(yp.timestamp) AS last_ts
+            FROM dbo.YachtInfo AS yi
+            LEFT JOIN dbo.YachtPosition AS yp
+                ON yp.yacht_id = yi.yacht_id
+            GROUP BY yi.yacht_id, yi.email, yi.phone
+            ORDER BY yi.yacht_id
+            """
+        )
+        rows = cur.fetchall()
 
-    b3 = Boat(id=random.randint(1, 100),
-              name=f'boat-{random.randint(1,100)}',
-              created_at=generate_random_timestamp().timestamp(),
-              is_online=False,
-              is_registered=True,
-              last_seen_at=generate_random_timestamp().timestamp(),
-              model="Maxis 33.3",
-              boat_type='motorboat',
-              contact_number='666666666')
+    now_ts = datetime.now().timestamp()
 
-    bs = Boats(array=[b1, b2, b3])
+    for row in rows:
+        yacht_id, email, phone, last_ts = row
 
-    response = JSONResponse(bs.model_dump(),
-                            status_code=status.HTTP_200_OK)
+        last_seen_ts: float | None = None
+        if last_ts is not None:
+            last_seen_ts = last_ts.timestamp()
 
-    return response
+        is_online = False
+        if last_seen_ts is not None and (now_ts - last_seen_ts) < 5 * 60:
+            is_online = True
+
+        boat = Boat(
+            id=int(yacht_id),
+            name=email or f"Yacht {yacht_id}",
+            created_at=now_ts,
+            is_online=is_online,
+            is_registered=True,
+            last_seen_at=last_seen_ts,
+            model=None,
+            boat_type="other",
+            contact_number=phone,
+        )
+        boats.append(boat)
+
+    bs = Boats(array=boats)
+
+    return JSONResponse(bs.model_dump(), status_code=status.HTTP_200_OK)

@@ -14,6 +14,7 @@ from yt_recorder.models.boat_position import BoatPosition
 from yt_recorder.models.boat_route import BoatRoute
 from yt_recorder.models.position_update import PositionUpdate
 from yt_recorder.models.recorder_synchronization import RecorderSynchronization
+from yt_recorder.collisions import CollisionChecker
 
 from SIM7000_handler import SIM7000_handler as SIM
 
@@ -83,6 +84,13 @@ class Recorder(Node):
 
         self.sim = SIM()
 
+        db_path = "/src/ros/yt_recorder/yt_recorder/database/MazuryMerged.db"
+
+        self.collision_checker = CollisionChecker(db_path=db_path)
+
+        self.last_collision = None
+        self.last_alert_message = None
+
     def cb_sim_timer(self):
         now = self.get_clock().now()
         try:
@@ -142,15 +150,27 @@ class Recorder(Node):
 
         now = datetime.now().timestamp()
 
-        boat_position = BoatPosition(id=0,
-                                     recorder_id=self.id,
-                                     timestamp=now,
-                                     latitude=self.latitude,
-                                     longitude=self.longitude)
+        boat_position = BoatPosition(
+            id=0,
+            recorder_id=self.id,
+            timestamp=now,
+            latitude=self.latitude,
+            longitude=self.longitude
+        )
 
         self.boat_route.positions.append(boat_position)
 
-        self.get_logger().info('Position snapshot taken')
+        collision = self.collision_checker.check_collision(
+            lat=self.latitude,
+            lon=self.longitude
+        )
+        self.last_collision = collision
+        self.last_alert_message = self.collision_checker.build_alert_message(collision)
+
+        if self.last_alert_message:
+            self.get_logger().warn(f"[ALERT] {self.last_alert_message}")
+        else:
+            self.get_logger().info('Position snapshot taken (no hazards)')
 
     def cb_update_timer(self):
         try:

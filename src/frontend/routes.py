@@ -1,4 +1,5 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
+import requests
 
 def init_routes(app):
 
@@ -18,8 +19,42 @@ def init_routes(app):
         print(f"Login próba: {email}")
         return redirect(url_for("home"))
 
-    @app.route("/register", methods=["GET"])
+    @app.route("/register", methods=["GET", "POST"])
     def register_page():
+        if request.method == "GET":
+            return render_template("register.html")
+
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        confirm = request.form.get("confirm")
+
+        if password != confirm:
+            flash("Passwords don't match!")
+            return render_template("register.html")
+
+        backend_url = "http://localhost:8081/api/user/register"
+
+        payload = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "phone": None
+        }
+
+        try:
+            response = requests.post(backend_url, json=payload)
+        except Exception as e:
+            print("Backend connection error:", e)
+            flash("Cannot connect to backend. Is FastAPI running?")
+            return render_template("register.html")
+
+        if response.status_code == 200:
+            flash("Registration successful!")
+            return redirect(url_for("login_page"))
+
+        detail = response.json().get("detail", "Unknown error")
+        flash(f"Registration failed: {detail}")
         return render_template("register.html")
 
     @app.route("/my_fleet")

@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from ..models.registration import Registration
 from ..models.recorder_synchronization import RecorderSynchronization
 from ..models.position_update import PositionUpdate
+from ..db import get_db_cursor
 
 recorder_router = APIRouter()
 
@@ -40,13 +41,31 @@ def recorder_synchronization(recorder_id: int, body: RecorderSynchronization):
 
 @recorder_router.post("/{recorder_id}/position_update", response_model=PositionUpdate)
 def recorder_position_update(recorder_id: int, body: PositionUpdate):
-    now = datetime.now()
+    from datetime import datetime
 
-    data = PositionUpdate(boat_id=recorder_id,
-                          timestamp=now.timestamp(),
-                          boat_position=body.boat_position)
+    ts_float = body.boat_position.timestamp
+    ts_dt = datetime.utcfromtimestamp(ts_float)
 
-    response = JSONResponse(content=data.model_dump(),
-                            status_code=status.HTTP_200_OK)
+    with get_db_cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO dbo.YachtPosition (yacht_id, timestamp, latitude, longitude)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                recorder_id,
+                ts_dt,
+                float(body.boat_position.latitude),
+                float(body.boat_position.longitude),
+            ),
+        )
 
-    return response
+    data = PositionUpdate(
+        boat_id=recorder_id,
+        timestamp=ts_float,
+        boat_position=body.boat_position,
+        status="ok",
+    )
+
+    return JSONResponse(content=data.model_dump(),
+                        status_code=status.HTTP_200_OK)
