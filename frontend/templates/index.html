@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sailboat Fleet Monitoring</title>
+<link rel="icon" type="image/png" href="static/logo.png">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+<link rel="stylesheet" href="static/style.css" />
+</head>
+
+<body>
+
+<header class="topbar">
+    <h1>SAILBOAT FLEET MONITORING</h1>
+
+    <nav>
+        <a href="/my_fleet" class="btn">My fleet</a>
+        <a href="/login" class="btn">Log In</a>
+        <a href="/register" class="btn">Register</a>
+    </nav>
+</header>
+
+<main>
+    <div id="map"></div>
+
+    <aside id="sidebar">
+        <h2>Sailboats in use:</h2>
+
+        <div class="search-box">
+            <input id="search-input" type="text" placeholder="Name" />
+            <button id="search-btn">Search</button>
+        </div>
+
+        <ul id="boat-list"></ul>
+    </aside>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

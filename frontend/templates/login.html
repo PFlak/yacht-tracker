@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In - Sailboat Fleet Monitoring</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style_login.css') }}">
+  <link rel="icon" type="image/png" href="/static/logo.png">
+</head>
+<body>
+  <header class="topbar">
+    <h1>SAILBOAT FLEET MONITORING</h1>
+    <nav>
+      <a href="/" class="btn">Home</a>
+      <a href="/register" class="btn">Register</a>
+    </nav>
+  </header>
+
+  <div class="login-container">
+    <div class="box-head">
+      <h2>Welcome Back</h2>
+    </div>
+
+    <form method="POST" action="/login">
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+
+      <div class="form-row">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+
+      <button type="submit">Log In</button>
+
+      <div class="form-foot">
+        <span>Don't have an account? <a href="/register">Register</a></span>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

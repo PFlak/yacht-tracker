@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Incidents</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style_incidents.css') }}">
+<link rel="icon" type="image/png" href="/static/logo.png">
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+</head>
+<body>
+
+<header class="topbar">
+    <h1>INCIDENTS</h1>
+    <nav>
+        <a href="/" class="btn">Home page</a>
+        <a href="/my_fleet" class="btn">My Fleet</a>
+        <a href="/logout" class="btn logout">Log Out</a>
+    </nav>
+</header>
+
+<div class="content-container">
+    <div class="fleet-column scroll-box">
+        <h2>Sailboats:</h2>
+        <div class="accordion">
+            <div class="acc-item">
+                <div class="acc-title">Alicja</div>
+                <div class="acc-content">
+                    <p><strong>Wynajęta:</strong> Tak</p>
+                    <ul>
+                        <li>Niebezpieczny teren (10.08.2022)</li>
+                        <li>Uszkodzenie steru (14.10.2023)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-title">Rybak</div>
+                <div class="acc-content">
+                    <p><strong>Wynajęta:</strong> Nie</p>
+                    <ul>
+                        <li>Sztorm (01.11.2024)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="acc-item">
+                <div class="acc-title">Posejdon</div>
+                <div class="acc-content">
+                    <p><strong>Wynajęta:</strong> Tak</p>
+                    <ul>
+                        <li>Awaria silnika (04.09.2024)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="boat-column">
+        <h2>Calendar view:</h2>
+        <div id="calendarContainer"></div>
+    </div>
+
+</div>
+
+<div id="dayPopup" class="popup hidden">
+    <div class="popup-content">
+        <h3 id="popup-date"></h3>
+        <div id="popup-event"></div>
+        <button class="close-btn" onclick="closePopup()">×</button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='incidents.js') }}"></script>
+</body>
+</html>

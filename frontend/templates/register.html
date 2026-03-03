@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Sailboat Fleet Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_register.css') }}">
+    <link rel="icon" type="image/png" href="/static/logo.png">
+</head>
+<body>
+  <header class="topbar">
+    <h1>SAILBOAT FLEET MONITORING</h1>
+    <nav>
+      <a href="/" class="btn">Home</a>
+      <a href="/login" class="btn">Log In</a>
+    </nav>
+  </header>
+
+  <div class="register-container">
+    <div class="register-box">
+      <h2>Create Account</h2>
+      <form method="POST" action="/register">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required>
+
+        <label for="confirm">Confirm Password</label>
+        <input type="password" id="confirm" name="confirm" required>
+
+        <button type="submit" class="btn-main">Register</button>
+      </form>
+
+      <p class="alt-link">
+        Already have an account?
+        <a href="/login">Log In</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

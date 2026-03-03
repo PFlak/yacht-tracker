@@ -1,0 +1,239 @@
+:root {
+  --sea-1: #c9f2ff;
+  --sea-2: #d4f2ff;
+  --accent: #0b3b4d;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, var(--sea-2) 0%, var(--sea-1) 100%);
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px;
+  background: #91c8d9;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+nav .btn {
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 40px;
+  background: white;
+  color: var(--accent);
+  font-weight: 600;
+  border: 2px solid var(--accent);
+}
+
+nav .btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+nav .logout {
+  background: #ffcbcb;
+}
+
+nav .logout:hover {
+  background: #dc3434;
+}
+
+.content-container {
+  display: flex;
+  gap: 30px;
+  padding: 20px 40px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.fleet-column, .boat-column {
+  flex: 1 1 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.fleet-column {
+  max-width: 400px;
+}
+
+.boat-column {
+  max-width: 600px;
+}
+
+/*Lista po lewej*/
+.scroll-box {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.acc-title {
+    padding: 15px;
+    font-size: 22px;
+    cursor: pointer;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.acc-title .acc-icon {
+    display: inline-block;
+    width: 25px;
+    text-align: center;
+    margin-right: 10px;
+    font-weight: bold;
+    transition: transform 0.3s;
+}
+
+.acc-content {
+    display: none;
+    padding: 10px 15px;
+    font-size: 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    background-color: white;
+    border-left: 2px solid #2f73b6;
+}
+
+.acc-content.open {
+    display: block;
+    max-height: 500px; 
+}
+
+.acc-title.active .acc-icon {
+    transform: rotate(45deg); 
+}
+
+
+/* Kalendarz  */
+#calendarContainer {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    max-width: 300px;
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-header button {
+    background: #0078d7;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.calendar-header button:hover {
+    background: #005ea2;
+}
+
+.calendar-days, .calendar-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+}
+
+.calendar-days {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.calendar-dates div {
+    padding: 8px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 1px;
+}
+
+.calendar-dates div:hover {
+    background: #e0e0e0;
+}
+
+.calendar-dates .today {
+    background: #0078d7;
+    color: white;
+}
+
+.calendar-dates .event {
+    background: #ff4d4d;
+    color: white;
+}
+
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right:0;
+    bottom:0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content:center;
+    align-items:center;
+}
+
+.popup-content {
+    position: relative; 
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 250px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.popup-content .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+}
+
+.popup-content .close-btn:hover {
+    background: darkred;
+}
+
+
+@media (max-width: 850px) {
+  .content-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .fleet-column, .boat-column {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
